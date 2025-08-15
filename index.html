@@ -178,7 +178,7 @@
         <input type="text" id="image" required />
       </label>
       <label>Stock:
-        <input type="text" id="Stock" required ></input>
+        <input type="number" id="stock" required ></input>
       </label>
       <button type="submit">Add to DB</button>
     </form>
@@ -292,6 +292,7 @@
       const price = parseInt(document.getElementById('price').value);
       const description = document.getElementById('description').value.trim();
       const image = document.getElementById('image').value.trim();
+      const stock = parseInt(document.getElementById('stock').value);
 
       if (!name || !price || !description || !image) {
         alert('Fill all fields!');
@@ -304,7 +305,8 @@
         name,
         price,
         description,
-        image
+        image,
+        stock
       };
 
       const updates = {};
@@ -321,5 +323,6 @@
   </script>
 </body>
 </html>
+
 
 
