@@ -169,16 +169,16 @@
         <input type="text" id="name" required />
       </label>
       <label>Price (number):
-        <input type="number" id="price" required />
+        <input type="number" id="price" />
       </label>
       <label>Description:
-        <input type="text" id="description" required />
+        <input type="text" id="description" />
       </label>
       <label>Image URL:
-        <input type="text" id="image" required />
+        <input type="text" id="image" />
       </label>
       <label>Stock:
-        <input type="number" id="stock" required ></input>
+        <input type="number" id="stock" ></input>
       </label>
       <button type="submit">Add to DB</button>
     </form>
@@ -284,47 +284,83 @@
     // Load menu initially
     loadMenu();
 
-    // Handle form submit to add new menu item
-    form.addEventListener('submit', e => {
-      e.preventDefault();
+      // Handle form submit to add new menu item
+  form.addEventListener('submit', e => {
+    e.preventDefault();
 
-      const name = document.getElementById('name').value.trim();
-      const price = parseInt(document.getElementById('price').value);
-      const description = document.getElementById('description').value.trim();
-      const image = document.getElementById('image').value.trim();
-      const stock = parseInt(document.getElementById('stock').value);
-      console.log(stock)
+    const nameInput = document.getElementById('name').value.trim();
+    const priceInput = document.getElementById('price').value.trim();
+    const descriptionInput = document.getElementById('description').value.trim();
+    const imageInput = document.getElementById('image').value.trim();
+    const stockInput = document.getElementById('stock').value.trim();
+    const stock = stockInput ? parseInt(stockInput) : null;
 
-      if (!name || !price || !description || !image) {
-        alert('Fill all fields!');
-        return;
+    if (!nameInput) {
+      alert('You must enter the name of the item!');
+      return;
+    }
+
+    const mainCourseRef = db.ref('menu/main_course');
+
+    mainCourseRef.once('value').then(snapshot => {
+      const items = snapshot.val() || {};
+      let foundKey = null;
+
+      // Check if item with same name exists
+      for (let key in items) {
+        if (items[key].name.toLowerCase() === nameInput.toLowerCase()) {
+          foundKey = key;
+          break;
+        }
       }
 
-      const newItemKey = db.ref().child('menu/main_course').push().key;
+      if (foundKey) {
+        // Item exists → update only the filled fields, keep old ones
+        const existingItem = items[foundKey];
+        const updatedItem = {
+          name: nameInput || existingItem.name,
+          price: priceInput ? parseInt(priceInput) : existingItem.price,
+          description: descriptionInput || existingItem.description,
+          image: imageInput || existingItem.image,
+          stock: stock !== null ? stock : existingItem.stock
+        };
 
-      const newItem = {
-        name,
-        price,
-        description,
-        image,
-        stock
-      };
+        db.ref('menu/main_course/' + foundKey).set(updatedItem)
+          .then(() => {
+            alert(`Updated item "${nameInput}" successfully!`);
+            form.reset();
+            loadMenu();
+          })
+          .catch(err => alert('Error updating item: ' + err.message));
+      } else {
+        // Item does not exist → require all fields
+        if (!priceInput || !descriptionInput || !imageInput || stock === null) {
+          alert('New item must have all fields filled!');
+          return;
+        }
 
-      const updates = {};
-      updates['/menu/main_course/' + newItemKey] = newItem;
+        const newItemKey = mainCourseRef.push().key;
+        const newItem = {
+          name: nameInput,
+          price: parseInt(priceInput),
+          description: descriptionInput,
+          image: imageInput,
+          stock
+        };
 
-      db.ref().update(updates)
-        .then(() => {
-          alert('Menu item added!');
-          form.reset();
-          loadMenu(); // refresh menu to show new item
-        })
-        .catch(err => alert('Error: ' + err.message));
+        const updates = {};
+        updates['/menu/main_course/' + newItemKey] = newItem;
+
+        db.ref().update(updates)
+          .then(() => {
+            alert('New menu item added!');
+            form.reset();
+            loadMenu();
+          })
+          .catch(err => alert('Error: ' + err.message));
+      }
     });
-  </script>
+  });
+</script>
 </body>
 </html>
-
-
-
-
