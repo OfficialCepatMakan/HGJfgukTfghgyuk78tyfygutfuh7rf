@@ -180,6 +180,12 @@
       <label>Stock:
         <input type="number" id="stock" ></input>
       </label>
+      <label>Filter:
+        <select id="filterdropdown" name="filterdropdown">
+          <option value="food">Food</option>
+          <option value="drink">Drink</option>
+        </select>
+      </label>
       <button type="submit">Add to DB</button>
     </form>
   </section>
@@ -340,13 +346,15 @@
           return;
         }
 
+        let filter = document.getElementById("filterdropdown").value
         const newItemKey = mainCourseRef.push().key;
         const newItem = {
           name: nameInput,
           price: parseInt(priceInput),
           description: descriptionInput,
           image: imageInput,
-          stock
+          stock,
+          filter: filter
         };
 
         const updates = {};
@@ -365,5 +373,6 @@
 </script>
 </body>
 </html>
+
 
 
