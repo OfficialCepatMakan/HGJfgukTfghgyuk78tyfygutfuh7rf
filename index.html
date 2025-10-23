@@ -180,6 +180,9 @@
       <label>Stock:
         <input type="number" id="stock" ></input>
       </label>
+      <label>discount:
+        <input type="number" id="discount" ></input>
+      </label>
       <label>Filter:
         <select id="filterdropdown" name="filterdropdown">
           <option value="food">Food</option>
@@ -300,6 +303,8 @@
     const descriptionInput = document.getElementById('description').value.trim();
     const imageInput = document.getElementById('image').value.trim();
     const stockInput = document.getElementById('stock').value.trim();
+    const discountInput = document.getElementById('discount').value.trim();
+    const discount = discountInput ? parseFloat(discountInput) : 0; // default to 0
     const stock = stockInput ? parseInt(stockInput) : null;
 
     if (!nameInput) {
@@ -329,7 +334,8 @@
           price: priceInput ? parseInt(priceInput) : existingItem.price,
           description: descriptionInput || existingItem.description,
           image: imageInput || existingItem.image,
-          stock: stock !== null ? stock : existingItem.stock
+          stock: stock !== null ? stock : existingItem.stock,
+          discount: discount || existingItem.discount,
         };
 
         db.ref('menu/main_course/' + foundKey).set(updatedItem)
@@ -353,6 +359,7 @@
           price: parseInt(priceInput),
           description: descriptionInput,
           image: imageInput,
+          discount: discount,
           stock,
           filter: filter
         };
@@ -373,6 +380,7 @@
 </script>
 </body>
 </html>
+
 
 
 
