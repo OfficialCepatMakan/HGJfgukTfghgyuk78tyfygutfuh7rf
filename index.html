@@ -335,7 +335,9 @@
           description: descriptionInput || existingItem.description,
           image: imageInput || existingItem.image,
           stock: stock !== null ? stock : existingItem.stock,
-          discount: discount || existingItem.discount,
+          discount: discount !== undefined && discount !== "" 
+            ? discount 
+            : existingItem.discount ?? null, // fallback to existing or null
         };
 
         db.ref('menu/main_course/' + foundKey).set(updatedItem)
@@ -359,7 +361,7 @@
           price: parseInt(priceInput),
           description: descriptionInput,
           image: imageInput,
-          discount: discount,
+          discount: discount ?? null,
           stock,
           filter: filter
         };
@@ -380,6 +382,7 @@
 </script>
 </body>
 </html>
+
 
 
 
