@@ -347,7 +347,7 @@
           discount: discount !== undefined && discount !== "" 
             ? discount 
             : existingItem.discount ?? null, // fallback to existing or null
-          filter: filter || existingItem.filter
+          filter: filter || existingItem.filter,
           limited: limited ?? existingItem.limited ?? "no"
         };
 
@@ -393,6 +393,7 @@
 </script>
 </body>
 </html>
+
 
 
 
