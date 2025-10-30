@@ -187,6 +187,13 @@
         <select id="filterdropdown" name="filterdropdown">
           <option value="food">Food</option>
           <option value="drink">Drink</option>
+          <option value="misc">Misc</option>
+        </select>
+      </label>
+      <label>Limited:
+        <select id="limiteddropdown" name="limiteddropdown">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
         </select>
       </label>
       <button type="submit">Add to DB</button>
@@ -306,6 +313,8 @@
     const discountInput = document.getElementById('discount').value.trim();
     const discount = discountInput ? parseFloat(discountInput) : 0; // default to 0
     const stock = stockInput ? parseInt(stockInput) : null;
+    let filter = document.getElementById("filterdropdown").value
+    let limited = document.getElementById("limiteddropdown").value
 
     if (!nameInput) {
       alert('You must enter the name of the item!');
@@ -338,6 +347,8 @@
           discount: discount !== undefined && discount !== "" 
             ? discount 
             : existingItem.discount ?? null, // fallback to existing or null
+          filter: filter || existingItem.filter
+          limited: limited ?? existingItem.limited ?? "no"
         };
 
         db.ref('menu/main_course/' + foundKey).set(updatedItem)
@@ -353,8 +364,7 @@
           alert('New item must have all fields filled!');
           return;
         }
-
-        let filter = document.getElementById("filterdropdown").value
+        
         const newItemKey = mainCourseRef.push().key;
         const newItem = {
           name: nameInput,
@@ -363,7 +373,8 @@
           image: imageInput,
           discount: discount ?? null,
           stock,
-          filter: filter
+          filter: filter,
+          limited: limited
         };
 
         const updates = {};
@@ -382,6 +393,7 @@
 </script>
 </body>
 </html>
+
 
 
 
