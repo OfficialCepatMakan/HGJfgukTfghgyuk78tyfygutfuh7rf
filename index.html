@@ -338,25 +338,26 @@
               .catch(err => alert('Error deleting item: ' + err.message));
           }
         });
-
-        // Star button logic
+              
         const starBtn = menuItem.querySelector('.best-seller-btn');
-        const starSvg = starBtn.querySelector('svg');
-
-        starBtn.addEventListener('click', () => {
-          const newValue = isBestSeller ? "no" : "yes";
-          db.ref(`menu/main_course/${key}/bestSeller`).set(newValue)
-            .then(() => {
-              // Update instantly
-              starSvg.setAttribute('fill', newValue === "yes" ? 'gold' : 'none');
-              if (newValue === "yes") {
-                menuItem.classList.add('bestseller-glow');
-              } else {
-                menuItem.classList.remove('bestseller-glow');
-              }
-            })
-            .catch(err => console.error("Error updating bestSeller:", err));
-        });
+        if (starBtn) {
+          const starSvg = starBtn.querySelector('svg');
+        
+          starBtn.addEventListener('click', () => {
+            const newValue = isBestSeller ? "no" : "yes";
+            db.ref(`menu/main_course/${key}/bestSeller`).set(newValue)
+              .then(() => {
+                starSvg.setAttribute('fill', newValue === "yes" ? 'gold' : 'none');
+                if (newValue === "yes") {
+                  menuItem.classList.add('bestseller-glow');
+                } else {
+                  menuItem.classList.remove('bestseller-glow');
+                }
+              })
+              .catch(err => console.error("Error updating bestSeller:", err));
+          });
+        }
+        
 
         menuGrid.appendChild(menuItem);
       }
