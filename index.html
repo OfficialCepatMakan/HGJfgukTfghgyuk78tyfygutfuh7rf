@@ -240,66 +240,106 @@
     const db = firebase.database();  // <-- compat style
   </script>
   <script>
-    const menuGrid = document.querySelector('.menu-grid');
-    const itemCount = document.querySelector('.item-count');
-    const form = document.getElementById('menuForm');
+  const menuGrid = document.querySelector('.menu-grid');
+  const itemCount = document.querySelector('.item-count');
+  const form = document.getElementById('menuForm');
 
-    // Load menu items from Firebase
-    function loadMenu() {
-      const mainCourseRef = db.ref('menu/main_course');
-      mainCourseRef.once('value', snapshot => {
-        const items = snapshot.val() || {};
-        menuGrid.innerHTML = '';
-        let count = 0;
+  function loadMenu() {
+    const mainCourseRef = db.ref('menu/main_course');
+    mainCourseRef.once('value', snapshot => {
+      const items = snapshot.val() || {};
+      menuGrid.innerHTML = '';
+      let count = 0;
 
-        for (let key in items) {
-          const item = items[key];
-          count++;
+      for (let key in items) {
+        const item = items[key];
+        count++;
 
-          // Create menu item element
-          const menuItem = document.createElement('div');
-          menuItem.className = 'menu-item';
+        const isBestSeller = item.bestSeller === "yes";
 
-          menuItem.innerHTML = `
-            <div class="item-image"><img src="${item.image}" alt="${item.name}"></div>
-            <div class="item-content">
-              <div class="item-header">
-                <h4 class="item-name">${item.name}</h4>
-                <span class="item-price">Rp ${item.price.toLocaleString('id-ID')}</span>
-              </div>
-              <p class="item-description">${item.description}</p>
-              <p class="item-description">stock: ${item.stock}</p>
-            </div>
-            <div class="item-actions">
-              <button class="delete-btn" title="Delete item" aria-label="Delete ${item.name}">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-              </button>
-            </div>
-          `;
+        // Create menu item element
+        const menuItem = document.createElement('div');
+        menuItem.className = 'menu-item';
 
-          // Attach delete handler
-          menuItem.querySelector('.delete-btn').addEventListener('click', () => {
-            if(confirm(`Are you sure you want to delete "${item.name}"?`)) {
-              db.ref('menu/main_course/' + key).remove()
-                .then(() => {
-                  alert(`Deleted "${item.name}"`);
-                  loadMenu();
-                })
-                .catch(err => alert('Error deleting item: ' + err.message));
-            }
-          });
-
-          menuGrid.appendChild(menuItem);
+        // Optional: add glow for best sellers
+        if (isBestSeller) {
+          menuItem.classList.add('bestseller-glow');
         }
 
-        itemCount.textContent = `${count} item${count !== 1 ? 's' : ''}`;
-      });
-    }
+        menuItem.innerHTML = `
+          <div class="item-image"><img src="${item.image}" alt="${item.name}"></div>
+          <div class="item-content">
+            <div class="item-header">
+              <h4 class="item-name">
+                ${item.name}
+                <button class="star-btn" title="Toggle Best Seller" aria-label="Toggle best seller">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="${isBestSeller ? 'gold' : 'none'}" 
+                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" 
+                    class="favourite-icon" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442
+                      c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61
+                      l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386
+                      a.562.562 0 0 0-.182-.557L3.04 10.385a.562.562 0 0 1 .321-.988l5.518-.442
+                      a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                  </svg>
+                </button>
+              </h4>
+              <span class="item-price">Rp ${item.price.toLocaleString('id-ID')}</span>
+            </div>
+            <p class="item-description">${item.description}</p>
+            <p class="item-description">Stock: ${item.stock}</p>
+          </div>
+          <div class="item-actions">
+            <button class="delete-btn" title="Delete item" aria-label="Delete ${item.name}">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        `;
 
-    // Load menu initially
-    loadMenu();
+        // Delete button
+        menuItem.querySelector('.delete-btn').addEventListener('click', () => {
+          if (confirm(`Are you sure you want to delete "${item.name}"?`)) {
+            db.ref('menu/main_course/' + key).remove()
+              .then(() => {
+                alert(`Deleted "${item.name}"`);
+                loadMenu();
+              })
+              .catch(err => alert('Error deleting item: ' + err.message));
+          }
+        });
+
+        // Star button logic
+        const starBtn = menuItem.querySelector('.star-btn');
+        const starSvg = starBtn.querySelector('svg');
+
+        starBtn.addEventListener('click', () => {
+          const newValue = isBestSeller ? "no" : "yes";
+          db.ref(`menu/main_course/${key}/bestSeller`).set(newValue)
+            .then(() => {
+              // Update instantly
+              starSvg.setAttribute('fill', newValue === "yes" ? 'gold' : 'none');
+              if (newValue === "yes") {
+                menuItem.classList.add('bestseller-glow');
+              } else {
+                menuItem.classList.remove('bestseller-glow');
+              }
+            })
+            .catch(err => console.error("Error updating bestSeller:", err));
+        });
+
+        menuGrid.appendChild(menuItem);
+      }
+
+      itemCount.textContent = `${count} item${count !== 1 ? 's' : ''}`;
+    });
+  }
+
+  // Load menu initially
+  loadMenu();
+
 
       // Handle form submit to add new menu item
   form.addEventListener('submit', e => {
@@ -393,10 +433,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
