@@ -277,13 +277,13 @@
     auth.signInWithPopup(provider)
       .then((result) => {
         console.log("Signed in as", result.user.displayName);
-        user = result.user.displayName
+        user = result.user.email
         fetch('Admins.json')
           .then(response => response.json())
           .then(data => {
             adminEmails = data.adminEmails;
             console.log("Loaded admin emails:", adminEmails);
-            if (!adminEmails.includes(user.email)) {
+            if (!adminEmails.includes(user)) {
               console.log("notadmin")
               console.log(user.email)
               document.body.innerHTML = "<h1>Access Denied</h1><p>You do not have permission to view this page.</p>";
@@ -496,6 +496,7 @@
 </script>
 </body>
 </html>
+
 
 
 
