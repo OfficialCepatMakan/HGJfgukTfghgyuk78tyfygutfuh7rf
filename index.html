@@ -282,7 +282,7 @@
           .then(data => {
             adminEmails = data.adminEmails;
             console.log("Loaded admin emails:", adminEmails);
-            if (!adminEmails.includes(user)) {
+            if (!adminEmails.includes(user.email)) {
               document.body.innerHTML = "<h1>Access Denied</h1><p>You do not have permission to view this page.</p>";
             }
           })
@@ -490,6 +490,7 @@
 </script>
 </body>
 </html>
+
 
 
 
