@@ -284,8 +284,10 @@
             adminEmails = data.adminEmails;
             console.log("Loaded admin emails:", adminEmails);
             if (!adminEmails.includes(user.email)) {
+              console.log("notadmin")
               document.body.innerHTML = "<h1>Access Denied</h1><p>You do not have permission to view this page.</p>";
-            } else if (adminEmails.includes(user.email)){
+            } else {
+              console.log("admin")
               document.body.innerHTML = "block";
             }
           })
@@ -493,6 +495,7 @@
 </script>
 </body>
 </html>
+
 
 
 
