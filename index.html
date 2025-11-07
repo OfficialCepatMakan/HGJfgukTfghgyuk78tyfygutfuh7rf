@@ -269,6 +269,29 @@
     const menuGrid = document.querySelector('.menu-grid');
     const itemCount = document.querySelector('.item-count');
     const form = document.getElementById('menuForm');
+    
+    auth.signInWithPopup(provider)
+      .then((result) => {
+        console.log("Signed in as", result.user.displayName);
+        user = result.user.displayName
+      })
+      .catch((error) => {
+        console.error("Error during sign-in:", error.message);
+      });
+
+    fetch('Admins.json')
+      .then(response => response.json())
+      .then(data => {
+        adminEmails = data.adminEmails;
+        console.log("Loaded admin emails:", adminEmails);
+      })
+      .catch(error => {
+        console.error("Failed to load admins.json:", error);
+      });
+
+    if (adminEmails.includes(user)) {
+      document.querySelector("html").style.display = "none";
+    }
 
     // Load menu items from Firebase
     function loadMenu() {
@@ -466,4 +489,5 @@
 </script>
 </body>
 </html>
+
 
