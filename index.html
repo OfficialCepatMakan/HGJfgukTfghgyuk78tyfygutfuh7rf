@@ -289,8 +289,8 @@
         console.error("Failed to load admins.json:", error);
       });
 
-    if (adminEmails.includes(user)) {
-      document.querySelector("html").style.display = "none";
+    if (!adminEmails.includes(user)) {
+      document.body.style.display = "none";
     }
 
     // Load menu items from Firebase
@@ -489,5 +489,6 @@
 </script>
 </body>
 </html>
+
 
 
